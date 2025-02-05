@@ -5,7 +5,7 @@ plugins {
 }
 
 assignment {
-    annotation("org.example.CustomAnnotation")
+    annotation("org.example.AssignOpAnnotation")
 }
 
 rewrite {

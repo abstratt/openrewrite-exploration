@@ -1,6 +1,6 @@
 package org.example
 
-@CustomAnnotation
+@AssignOpAnnotation
 class Property<T> {
     var value: T? = null
     fun set(newValue: T) {
