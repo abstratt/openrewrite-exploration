@@ -1,6 +1,8 @@
 package org.example
 
+import org.example.utils.assign
+
 fun main() {
-    val task = SomeOtherTask()
-    task.myProperty = "Foo"
+    val task = YetAnotherTask()
+    task.counter = 20
 }

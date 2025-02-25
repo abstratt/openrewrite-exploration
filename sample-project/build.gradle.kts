@@ -10,10 +10,8 @@ assignment {
 
 rewrite {
     activeRecipe(
-        "org.gradle.migration.ImportAssign",
-        //"org.gradle.kotlin.AddAssignImportRecipe",
+        "org.gradle.demo.migration.ImportAssign",
         "org.openrewrite.FindParseFailures"
-        //"org.openrewrite.java.search.FindMissingTypes"
     )
     setExportDatatables(true)
 }
@@ -24,7 +22,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    rewrite(project(":gradle-migrations"))
+    rewrite(project(":demo-migrations"))
 //    implementation("org.openrewrite:rewrite-core:8.44.2")
 //    implementation("org.openrewrite:rewrite-kotlin:1.26.0")
 //    implementation("org.openrewrite:rewrite-java:8.44.2")

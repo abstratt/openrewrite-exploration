@@ -1,4 +1,4 @@
-package org.gradle.migration
+package org.gradle.demo.migration
 
 import org.openrewrite.ExecutionContext
 import org.openrewrite.Recipe
@@ -15,6 +15,7 @@ class ImportAssign : Recipe() {
     override fun getVisitor(): KotlinIsoVisitor<ExecutionContext> {
         return object : KotlinIsoVisitor<ExecutionContext>() {
             override fun visitAssignment(assignment: J.Assignment, p: ExecutionContext): J.Assignment {
+                println("Running visitor against $assignment")
                 val r = super.visitAssignment(assignment, p)
                 addImportBasedOnPropertyAnnotation(assignment)
                 return r
