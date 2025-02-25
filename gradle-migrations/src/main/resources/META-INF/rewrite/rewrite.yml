@@ -1,0 +1,47 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: org.gradle.migration.Gradle8to9
+displayName: "My Custom Recipe"
+description: "A migration recipe for Gradle projects."
+recipeList:
+#  Not ready yet
+#  - org.gradle.migration.JavaConvertToLazyProperty:
+#      oldPattern: org.gradle.api.tasks.JavaExec setClasspath(org.gradle.api.file.FileCollection)
+#      newPropertyGetter: getClasspath
+#      newPropertySetter: setFrom
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: org.gradle.api.tasks.compile.CompileOptions setIncremental(boolean)
+      newPropertyGetter: getIncremental
+      newPropertySetter: set
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: org.gradle.api.tasks.testing.Test setTestClassesDirs(org.gradle.api.file.FileCollection)
+      newPropertyGetter: getTestClassesDirs
+      newPropertySetter: setFrom
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: org.gradle.api.tasks.testing.Test setClasspath(org.gradle.api.file.FileCollection)
+      newPropertyGetter: getClasspath
+      newPropertySetter: setFrom
+# TODO-RC duplicated, as we need to match on the type being used, it is not enough to match on the type defining the method
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: org.gradle.api.tasks.testing.Test setMaxHeapSize(String)
+      newPropertyGetter: getMaxHeapSize
+      newPropertySetter: set
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: org.gradle.process.JavaForkOptions setMaxHeapSize(String)
+      newPropertyGetter: getMaxHeapSize
+      newPropertySetter: set
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: org.gradle.api.publish.maven.MavenArtifact setClassifier(String)
+      newPropertyGetter: getClassifier
+      newPropertySetter: set
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: org.gradle.api.publish.maven.MavenPom setPackaging(String)
+      newPropertyGetter: getPackaging
+      newPropertySetter: set
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: org.gradle.api.tasks.compile.CompileOptions setEncoding(String)
+      newPropertyGetter: getEncoding
+      newPropertySetter: set
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: org.gradle.api.plugins.quality.CodeQualityExtension setToolVersion(String)
+      newPropertyGetter: getToolVersion
+      newPropertySetter: set
