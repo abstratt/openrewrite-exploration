@@ -12,7 +12,7 @@ import org.openrewrite.java.tree.J.MethodInvocation
 
 
 @Suppress("unused")
-public class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  val oldPattern: String, @JsonProperty("newPropertyGetter") val newPropertyGetter: String, @JsonProperty("newPropertySetter") val newPropertySetter: String) : Recipe() {
+public class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  val oldPattern: String, @JsonProperty("newPropertyGetter") val newPropertyGetter: String, @JsonProperty("newPropertySetter") val newPropertySetter: String, @JsonProperty("targetType") val targetType: String? = null) : Recipe() {
     override fun getDisplayName(): String = "Converts eager property ${oldPattern} to lazy property usage $newPropertyGetter"
     override fun getDescription(): String = "${displayName}."
 
@@ -20,9 +20,21 @@ public class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  
 
     override fun getVisitor(): JavaVisitor<ExecutionContext> {
         return object : JavaVisitor<ExecutionContext>() {
+
             override fun visitMethodInvocation(method: MethodInvocation, p: ExecutionContext): J {
                 val method: MethodInvocation = super.visitMethodInvocation(method, p) as MethodInvocation
                 if (methodMatcher.matches(method)) {
+                    if (targetType != null) {
+                        val targetClass = findClass(targetType)!!
+                        val actualClass = findClass(method.methodType?.declaringType?.fullyQualifiedName)
+                        if (actualClass == null || !targetClass.isAssignableFrom(actualClass)) {
+                            return method
+                        }
+                        if (targetClass != actualClass) {
+                            println("$targetClass is a kind of $actualClass")
+                        }
+                    }
+
                     println("*** Modifying ${cursor.firstEnclosing(SourceFile::class.java)!!.sourcePath}")
 
                     // Extract the argument (boolean b)
@@ -46,4 +58,11 @@ public class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  
             }
         }
     }
+
+    private fun findClass(targetType: String?): Class<*>? =
+        try {
+            targetType?.let { Class.forName(it) }
+        } catch (e: ClassNotFoundException) {
+            null
+        }
 }

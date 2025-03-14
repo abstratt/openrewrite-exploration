@@ -1,7 +1,5 @@
 package org.gradle.migration
 
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.compile.CompileOptions
 import org.junit.jupiter.api.Test
 import org.openrewrite.java.Assertions
 import org.openrewrite.test.RecipeSpec
