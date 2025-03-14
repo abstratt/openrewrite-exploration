@@ -3,11 +3,11 @@ name: org.gradle.migration.Gradle8to9
 displayName: "My Custom Recipe"
 description: "A migration recipe for Gradle projects."
 recipeList:
-#  Not ready yet
-#  - org.gradle.migration.JavaConvertToLazyProperty:
-#      oldPattern: org.gradle.api.tasks.JavaExec setClasspath(org.gradle.api.file.FileCollection)
-#      newPropertyGetter: getClasspath
-#      newPropertySetter: setFrom
+  - org.gradle.migration.JavaConvertToLazyProperty:
+      oldPattern: "*..* setClasspath(org.gradle.api.file.FileCollection)"
+      newPropertyGetter: getClasspath
+      newPropertySetter: setFrom
+      targetType: org.gradle.process.JavaExecSpec
   - org.gradle.migration.JavaConvertToLazyProperty:
       oldPattern: org.gradle.api.tasks.compile.CompileOptions setIncremental(boolean)
       newPropertyGetter: getIncremental
@@ -20,15 +20,11 @@ recipeList:
       oldPattern: org.gradle.api.tasks.testing.Test setClasspath(org.gradle.api.file.FileCollection)
       newPropertyGetter: getClasspath
       newPropertySetter: setFrom
-# TODO-RC duplicated, as we need to match on the type being used, it is not enough to match on the type defining the method
   - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: org.gradle.api.tasks.testing.Test setMaxHeapSize(String)
+      oldPattern: "*..* setMaxHeapSize(String)"
       newPropertyGetter: getMaxHeapSize
       newPropertySetter: set
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: org.gradle.process.JavaForkOptions setMaxHeapSize(String)
-      newPropertyGetter: getMaxHeapSize
-      newPropertySetter: set
+      targetType: org.gradle.process.JavaForkOptions
   - org.gradle.migration.JavaConvertToLazyProperty:
       oldPattern: org.gradle.api.publish.maven.MavenArtifact setClassifier(String)
       newPropertyGetter: getClassifier
@@ -45,3 +41,7 @@ recipeList:
       oldPattern: org.gradle.api.plugins.quality.CodeQualityExtension setToolVersion(String)
       newPropertyGetter: getToolVersion
       newPropertySetter: set
+  - org.gradle.migration.GroovyAddAssignment
+#  - org.gradle.migration.JavaFromLazyToEagerPropertyAssignment:
+#      targetType: org.gradle.api.artifacts.repositories.MavenArtifactRepository
+#      propertyAccessor: getUrl
