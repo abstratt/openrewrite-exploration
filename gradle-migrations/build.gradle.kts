@@ -9,16 +9,15 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("org.openrewrite.recipe:rewrite-recipe-bom:latest.release"))
+    //implementation(platform("org.openrewrite.recipe:rewrite-recipe-bom:latest.release"))
     implementation(kotlin("stdlib"))
-    implementation("org.openrewrite:rewrite-core:8.45.1")
-    implementation("org.openrewrite:rewrite-kotlin:1.27.0")
-    implementation("org.openrewrite:rewrite-java:8.45.1")
-    runtimeOnly("org.openrewrite:rewrite-java-17:8.47.1")
-    implementation("org.openrewrite.meta:rewrite-analysis:2.17.0")
-    implementation("org.openrewrite.meta:rewrite-analysis:2.17.0")
-    //implementation("org.openrewrite.rewrite:org.openrewrite.rewrite.gradle.plugin:7.1.4")
-    testImplementation("org.openrewrite:rewrite-test")
+    implementation("org.openrewrite:rewrite-core:8.47.1")
+    implementation("org.openrewrite:rewrite-kotlin:1.28.0")
+    implementation("org.openrewrite:rewrite-groovy:8.47.1")
+    implementation("org.openrewrite:rewrite-java:8.47.1")
+    implementation("org.openrewrite.meta:rewrite-analysis:2.18.0")
+    testImplementation("org.openrewrite:rewrite-java-17:8.47.1")
+    testImplementation("org.openrewrite:rewrite-test:8.47.1")
     testImplementation(kotlin("test"))
 }
 
