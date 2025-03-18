@@ -8,6 +8,9 @@ recipeList:
       newPropertyGetter: getClasspath
       newPropertySetter: setFrom
       targetType: org.gradle.process.JavaExecSpec
+  - org.gradle.migration.KotlinAddOperatorImports:
+      targetType: org.gradle.api.tasks.compile.CompileOptions
+      propertyName: incremental
   - org.gradle.migration.JavaConvertToLazyProperty:
       oldPattern: org.gradle.api.tasks.compile.CompileOptions setIncremental(boolean)
       newPropertyGetter: getIncremental
