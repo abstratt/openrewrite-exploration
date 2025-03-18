@@ -23,6 +23,9 @@ recipeList:
       oldPattern: org.gradle.api.tasks.testing.Test setClasspath(org.gradle.api.file.FileCollection)
       newPropertyGetter: getClasspath
       newPropertySetter: setFrom
+  - org.gradle.migration.KotlinAddOperatorImports:
+      targetType: org.gradle.process.JavaForkOptions
+      propertyName: maxHeapSize
   - org.gradle.migration.JavaConvertToLazyProperty:
       oldPattern: "*..* setMaxHeapSize(String)"
       newPropertyGetter: getMaxHeapSize

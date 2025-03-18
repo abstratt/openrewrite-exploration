@@ -1,11 +1,12 @@
 package org.gradle.migration
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.gradle.internal.extensions.stdlib.capitalized
 import org.openrewrite.ExecutionContext
 import org.openrewrite.Recipe
 import org.openrewrite.java.tree.J
 import org.openrewrite.java.tree.JavaType
-import org.openrewrite.java.tree.JavaType.Variable
+import org.openrewrite.java.tree.JavaType.Method
 import org.openrewrite.kotlin.KotlinIsoVisitor
 
 @Suppress("unused")
@@ -19,6 +20,7 @@ class KotlinAddOperatorImports constructor(@JsonProperty("targetType") val targe
     }
 
     override fun getVisitor(): KotlinIsoVisitor<ExecutionContext> {
+        val candidateSetter = "set${propertyName.capitalized()}"
         return object : KotlinIsoVisitor<ExecutionContext>() {
             override fun visitAssignment(assignment: J.Assignment, p: ExecutionContext): J.Assignment {
                 var addImport = false
@@ -27,10 +29,11 @@ class KotlinAddOperatorImports constructor(@JsonProperty("targetType") val targe
                         val target = fieldAccess.target
                         val targetType = target.type as JavaType.Class?
                         if (targetType !== null) {
-                            val resolvedProperty = targetType.members.find {
-                                it.name == propertyName
+                            val allMembers = targetType.allMethods()
+                            val resolvedSetter = allMembers.find {
+                                it.name == candidateSetter
                             }
-                            if (resolvedProperty is Variable) {
+                            if (resolvedSetter is Method) {
                                 addImport = true
                             }
                         }
@@ -44,4 +47,11 @@ class KotlinAddOperatorImports constructor(@JsonProperty("targetType") val targe
             }
         }
     }
+}
+
+fun JavaType.FullyQualified.allMethods(): Sequence<Method> {
+    val inherited = interfaces
+        .asSequence()
+        .flatMap { it.allMethods() }
+    return inherited + (supertype?.allMethods() ?: emptySequence()) + methods.asSequence()
 }

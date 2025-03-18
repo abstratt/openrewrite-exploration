@@ -19,6 +19,7 @@ dependencies {
     testImplementation("org.openrewrite:rewrite-java-17:8.47.1")
     testImplementation("org.openrewrite:rewrite-test:8.47.1")
     testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.1")
 }
 
 tasks.test {

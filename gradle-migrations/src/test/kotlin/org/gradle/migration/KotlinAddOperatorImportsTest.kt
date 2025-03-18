@@ -1,6 +1,7 @@
 package org.gradle.migration
 
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.openrewrite.java.JavaParser
 import org.openrewrite.kotlin.Assertions
 import org.openrewrite.kotlin.KotlinParser
@@ -25,18 +26,20 @@ class KotlinAddOperatorImportsTest : RewriteTest {
         spec.afterTypeValidationOptions(TypeValidation.all().methodInvocations(false))
     }
 
-    @Test
-    fun addImport() {
+    @ParameterizedTest
+    @CsvSource(
+        "org.gradle.api.tasks.compile.JavaCompile, options.isIncremental, true",
+        "org.gradle.api.tasks.testing.Test, maxHeapSize, true",
+    )
+    fun addImport(targetType: String, path: String, value: String) {
         rewriteRun(
             Assertions.kotlin(
                 """
             package com.yourorg
             
-            import org.gradle.api.tasks.compile.JavaCompile
-            
             class MyClass {
-                fun use(javaCompile: JavaCompile) {
-                    javaCompile.options.isIncremental = true
+                fun use(target: $targetType) {
+                    target.$path = $value
                 }
             }
                 
@@ -44,12 +47,11 @@ class KotlinAddOperatorImportsTest : RewriteTest {
                 """
             package com.yourorg
             
-            import org.gradle.api.tasks.compile.JavaCompile
             import org.gradle.kotlin.dsl.assign
 
             class MyClass {
-                fun use(javaCompile: JavaCompile) {
-                    javaCompile.options.isIncremental = true
+                fun use(target: $targetType) {
+                    target.$path = $value
                 }
             }
                 
