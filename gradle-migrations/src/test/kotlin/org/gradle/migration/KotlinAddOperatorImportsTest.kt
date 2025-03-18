@@ -32,8 +32,10 @@ class KotlinAddOperatorImportsTest : RewriteTest {
                 """
             package com.yourorg
             
+            import org.gradle.api.tasks.compile.JavaCompile
+            
             class MyClass {
-                fun use(javaCompile: org.gradle.api.tasks.compile.JavaCompile) {
+                fun use(javaCompile: JavaCompile) {
                     javaCompile.options.isIncremental = true
                 }
             }
@@ -42,10 +44,11 @@ class KotlinAddOperatorImportsTest : RewriteTest {
                 """
             package com.yourorg
             
+            import org.gradle.api.tasks.compile.JavaCompile
             import org.gradle.kotlin.dsl.assign
-            
+
             class MyClass {
-                fun use(javaCompile: org.gradle.api.tasks.compile.JavaCompile) {
+                fun use(javaCompile: JavaCompile) {
                     javaCompile.options.isIncremental = true
                 }
             }
