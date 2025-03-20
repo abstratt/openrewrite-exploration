@@ -9,10 +9,12 @@ import org.openrewrite.java.MethodMatcher
 import org.openrewrite.java.tree.Expression
 import org.openrewrite.java.tree.J
 import org.openrewrite.java.tree.J.MethodInvocation
+import org.openrewrite.java.tree.JavaType
+import java.util.regex.Pattern
 
 
 @Suppress("unused")
-public class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  val oldPattern: String, @JsonProperty("newPropertyGetter") val newPropertyGetter: String, @JsonProperty("newPropertySetter") val newPropertySetter: String, @JsonProperty("targetType") val targetType: String? = null) : Recipe() {
+class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  val oldPattern: String, @JsonProperty("newPropertyGetter") val newPropertyGetter: String, @JsonProperty("newPropertySetter") val newPropertySetter: String, @JsonProperty("targetType") val targetType: String? = null) : Recipe() {
     override fun getDisplayName(): String = "Converts eager property ${oldPattern} to lazy property usage $newPropertyGetter"
     override fun getDescription(): String = "${displayName}."
 
@@ -22,16 +24,12 @@ public class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  
         return object : JavaVisitor<ExecutionContext>() {
 
             override fun visitMethodInvocation(method: MethodInvocation, p: ExecutionContext): J {
-                val method: MethodInvocation = super.visitMethodInvocation(method, p) as MethodInvocation
+                val base: MethodInvocation = super.visitMethodInvocation(method, p) as MethodInvocation
                 if (methodMatcher.matches(method)) {
                     if (targetType != null) {
-                        val targetClass = findClass(targetType)!!
-                        val actualClass = findClass(method.methodType?.declaringType?.fullyQualifiedName)
-                        if (actualClass == null || !targetClass.isAssignableFrom(actualClass)) {
-                            return method
-                        }
-                        if (targetClass != actualClass) {
-                            println("$targetClass is a kind of $actualClass")
+                        val declaringType: JavaType.FullyQualified? = method.methodType?.declaringType
+                        if (declaringType == null || !declaringType.isAssignableFrom(Pattern.compile(targetType))) {
+                            return base
                         }
                     }
 
@@ -54,7 +52,7 @@ public class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  
                     println("*** Refactored $method into $modified")
                     return modified
                 }
-                return method
+                return base
             }
         }
     }
