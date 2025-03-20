@@ -7,9 +7,10 @@ import org.openrewrite.test.RewriteTest
 import org.openrewrite.test.TypeValidation
 
 class JavaConvertToLazyPropertyTest : RewriteTest {
-    override fun defaults(spec: RecipeSpec): Unit {
+    override fun defaults(spec: RecipeSpec) {
         spec.recipe(JavaConvertToLazyPropertyTest::class.java.getResourceAsStream("/META-INF/rewrite/rewrite.yml")!!,
             "org.gradle.migration.Gradle8to9")
+        // resulting code is not necessarily valid against the current classpath, and that is fine
         spec.afterTypeValidationOptions(TypeValidation.all().methodInvocations(false))
     }
 
@@ -32,11 +33,9 @@ class JavaConvertToLazyPropertyTest : RewriteTest {
                         .getByType(JavaPluginExtension.class)
                         .getSourceSets()
                         .getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-                    project.getPlugins().withType(JavaPlugin.class, (javaPlugin) -> {
-                        project.getTasks()
+                    project.getPlugins().withType(JavaPlugin.class, (javaPlugin) -> project.getTasks()
                             .named(mainSourceSet.getCompileJavaTaskName(), JavaCompile.class)
-                            .configure((compileJava) -> compileJava.getOptions().setIncremental(true));
-                    });
+                            .configure((compileJava) -> compileJava.getOptions().setIncremental(true)));
                 }
             }
                 
@@ -56,11 +55,9 @@ class JavaConvertToLazyPropertyTest : RewriteTest {
                         .getByType(JavaPluginExtension.class)
                         .getSourceSets()
                         .getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-                    project.getPlugins().withType(JavaPlugin.class, (javaPlugin) -> {
-                        project.getTasks()
+                    project.getPlugins().withType(JavaPlugin.class, (javaPlugin) -> project.getTasks()
                             .named(mainSourceSet.getCompileJavaTaskName(), JavaCompile.class)
-                            .configure((compileJava) ->  compileJava.getOptions().getIncremental().set(true));
-                    });
+                            .configure((compileJava) ->  compileJava.getOptions().getIncremental().set(true)));
                 }
             }
                 
@@ -84,9 +81,7 @@ class JavaConvertToLazyPropertyTest : RewriteTest {
             public class ConfigurationPropertiesPlugin implements Plugin<Project> {
                 @Override
                 public void apply(Project project) {
-                    project.getTasks().withType(Test.class, (test) -> {
-                        test.setMaxHeapSize("1024M");
-                    });
+                    project.getTasks().withType(Test.class, (test) -> test.setMaxHeapSize("1024M"));
                 }
             }
                 """.trimIndent(),
@@ -101,10 +96,7 @@ class JavaConvertToLazyPropertyTest : RewriteTest {
             public class ConfigurationPropertiesPlugin implements Plugin<Project> {
                 @Override
                 public void apply(Project project) {
-                    project.getTasks().withType(Test.class, (test) -> {
-                        
-                        test.getMaxHeapSize().set("1024M");
-                    });
+                    project.getTasks().withType(Test.class, (test) ->  test.getMaxHeapSize().set("1024M"));
                 }
             }
                 """.trimIndent()
@@ -132,9 +124,7 @@ class JavaConvertToLazyPropertyTest : RewriteTest {
                         .getByType(JavaPluginExtension.class)
                         .getSourceSets()
                         .getByName(SourceSet.TEST_SOURCE_SET_NAME);
-                    project.getTasks().register("myTest", Test.class, (task) -> {
-                        task.setTestClassesDirs(intTestSourceSet.getOutput().getClassesDirs());
-                    });
+                    project.getTasks().register("myTest", Test.class, (task) -> task.setTestClassesDirs(intTestSourceSet.getOutput().getClassesDirs()));
                 }
             }
                 
@@ -154,10 +144,7 @@ class JavaConvertToLazyPropertyTest : RewriteTest {
                         .getByType(JavaPluginExtension.class)
                         .getSourceSets()
                         .getByName(SourceSet.TEST_SOURCE_SET_NAME);
-                    project.getTasks().register("myTest", Test.class, (task) -> {
-                        
-                        task.getTestClassesDirs().setFrom(intTestSourceSet.getOutput().getClassesDirs());
-                    });
+                    project.getTasks().register("myTest", Test.class, (task) ->  task.getTestClassesDirs().setFrom(intTestSourceSet.getOutput().getClassesDirs()));
                 }
             }
                 """.trimIndent()

@@ -3,14 +3,12 @@ package org.gradle.migration
 import org.junit.jupiter.api.Test
 import org.openrewrite.test.RecipeSpec
 import org.openrewrite.test.RewriteTest
-import org.openrewrite.test.TypeValidation
 import org.openrewrite.groovy.Assertions
 
 class GroovyAddAssignmentTest : RewriteTest {
-    override fun defaults(spec: RecipeSpec): Unit {
+    override fun defaults(spec: RecipeSpec) {
         spec.recipe(javaClass.getResourceAsStream("/META-INF/rewrite/rewrite.yml")!!,
             "org.gradle.migration.Gradle8to9")
-        spec.afterTypeValidationOptions(TypeValidation.all().methodInvocations(false))
     }
 
     @Test
@@ -64,8 +62,8 @@ class GroovyAddAssignmentTest : RewriteTest {
             package com.yourorg
             
             class OtherClass {
-                def String propA
-                def Integer propB
+                String propA
+                Integer propB
             }
             
             class MyClass {
@@ -95,8 +93,8 @@ class GroovyAddAssignmentTest : RewriteTest {
             package com.yourorg
             
             class OtherClass {
-                def String propA
-                def Integer propB
+                String propA
+                Integer propB
             }
             
             class MyClass {
@@ -118,8 +116,8 @@ class GroovyAddAssignmentTest : RewriteTest {
             package com.yourorg
             
             class OtherClass {
-                def String propA
-                def Integer propB
+                String propA
+                Integer propB
             }
             
             class MyClass {

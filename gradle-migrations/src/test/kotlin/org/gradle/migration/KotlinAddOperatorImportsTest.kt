@@ -23,7 +23,6 @@ class KotlinAddOperatorImportsTest : RewriteTest {
     override fun defaults(spec: RecipeSpec) {
         spec.recipe(KotlinAddOperatorImportsTest::class.java.getResourceAsStream("/META-INF/rewrite/rewrite.yml")!!,
             "org.gradle.migration.Gradle8to9")
-        spec.afterTypeValidationOptions(TypeValidation.all().methodInvocations(false))
     }
 
     @ParameterizedTest
