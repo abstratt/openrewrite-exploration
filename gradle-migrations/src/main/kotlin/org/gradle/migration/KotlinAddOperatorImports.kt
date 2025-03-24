@@ -23,29 +23,35 @@ class KotlinAddOperatorImports constructor(@JsonProperty("targetType") val targe
         val candidateSetter = "set${propertyName.capitalized()}"
         return object : KotlinIsoVisitor<ExecutionContext>() {
             override fun visitAssignment(assignment: J.Assignment, p: ExecutionContext): J.Assignment {
-                var addImport = false
+                var containsAssignment = false
                 assignment.variable.accept(object : KotlinIsoVisitor<ExecutionContext>() {
                     override fun visitFieldAccess(fieldAccess: J.FieldAccess, p: ExecutionContext): J.FieldAccess {
                         val target = fieldAccess.target
-                        val targetType = target.type as JavaType.Class?
+                        val targetType = findClass(target.type)
                         if (targetType !== null) {
                             val allMembers = targetType.allMethods()
                             val resolvedSetter = allMembers.find {
                                 it.name == candidateSetter
                             }
                             if (resolvedSetter is Method) {
-                                addImport = true
+                                containsAssignment = true
                             }
                         }
                         return fieldAccess
                     }
                 }, p)
-                if (addImport) {
+                if (containsAssignment) {
                     maybeAddImport("org.gradle.kotlin.dsl.assign", false)
                 }
                 return super.visitAssignment(assignment, p)
             }
         }
+    }
+
+    private fun findClass(javaType: JavaType?): JavaType.Class? = when(javaType) {
+        is JavaType.Class -> javaType
+        is JavaType.Parameterized -> findClass(javaType.type)
+        else -> null
     }
 }
 
