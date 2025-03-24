@@ -35,7 +35,6 @@ class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  val old
 
                     println("*** Modifying ${cursor.firstEnclosing(SourceFile::class.java)!!.sourcePath}")
 
-                    // Extract the argument (boolean b)
                     val argument: Expression = method.arguments[0]
 
                     // Transform `setIncremental(b)` → `getIncremental()`
