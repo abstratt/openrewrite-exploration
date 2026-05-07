@@ -55,8 +55,11 @@ class JavaFromLazyToEagerPropertyAssignment(
                         !isLazyType(parent.variableType?.type)
                     is J.MethodInvocation ->
                         if (parent.select === current) {
-                            // chained call: the next method has to operate on the eager value
-                            true
+                            // Chain: the next method is invoked on our result. If it is
+                            // declared on Provider/Property, the chain stays lazy and we
+                            // must not wrap. If it is declared on the eager type
+                            // (e.g. URI.toASCIIString), wrap.
+                            !isLazyType(parent.methodType?.declaringType)
                         } else {
                             val argIndex = parent.arguments.indexOfFirst { it === current }
                             !isLazyType(paramTypeAt(parent, argIndex))

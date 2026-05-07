@@ -1,53 +1,12 @@
 type: specs.openrewrite.org/v1beta/recipe
 name: org.gradle.migration.Gradle9to10
-displayName: "My Custom Recipe"
-description: "A migration recipe for Gradle projects."
+displayName: "Gradle 9.5 → 10 migration"
+description: "Migrates eager property usage to the lazy Property API. Children are built dynamically from src/main/resources/migration-data.json."
 recipeList:
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: "*..* setClasspath(org.gradle.api.file.FileCollection)"
-      newPropertyGetter: getClasspath
-      newPropertySetter: setFrom
-      targetType: org.gradle.process.JavaExecSpec
-  - org.gradle.migration.KotlinAddOperatorImports:
-      targetType: org.gradle.api.tasks.compile.CompileOptions
-      propertyName: incremental
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: org.gradle.api.tasks.compile.CompileOptions setIncremental(boolean)
-      newPropertyGetter: getIncremental
-      newPropertySetter: set
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: org.gradle.api.tasks.testing.Test setTestClassesDirs(org.gradle.api.file.FileCollection)
-      newPropertyGetter: getTestClassesDirs
-      newPropertySetter: setFrom
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: org.gradle.api.tasks.testing.Test setClasspath(org.gradle.api.file.FileCollection)
-      newPropertyGetter: getClasspath
-      newPropertySetter: setFrom
-  - org.gradle.migration.KotlinAddOperatorImports:
-      targetType: org.gradle.process.JavaForkOptions
-      propertyName: maxHeapSize
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: "*..* setMaxHeapSize(String)"
-      newPropertyGetter: getMaxHeapSize
-      newPropertySetter: set
-      targetType: org.gradle.process.JavaForkOptions
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: org.gradle.api.publish.maven.MavenArtifact setClassifier(String)
-      newPropertyGetter: getClassifier
-      newPropertySetter: set
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: org.gradle.api.publish.maven.MavenPom setPackaging(String)
-      newPropertyGetter: getPackaging
-      newPropertySetter: set
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: org.gradle.api.tasks.compile.CompileOptions setEncoding(String)
-      newPropertyGetter: getEncoding
-      newPropertySetter: set
-  - org.gradle.migration.JavaConvertToLazyProperty:
-      oldPattern: org.gradle.api.plugins.quality.CodeQualityExtension setToolVersion(String)
-      newPropertyGetter: getToolVersion
-      newPropertySetter: set
+  - org.gradle.migration.MigrationCompositeRecipe:
+      target: org.gradle.migration.JavaConvertToLazyProperty
+  - org.gradle.migration.MigrationCompositeRecipe:
+      target: org.gradle.migration.KotlinAddOperatorImports
+  - org.gradle.migration.MigrationCompositeRecipe:
+      target: org.gradle.migration.JavaFromLazyToEagerPropertyAssignment
   - org.gradle.migration.GroovyAddAssignment
-  - org.gradle.migration.JavaFromLazyToEagerPropertyAssignment:
-      targetType: org.gradle.api.artifacts.repositories.MavenArtifactRepository
-      propertyAccessor: getUrl
