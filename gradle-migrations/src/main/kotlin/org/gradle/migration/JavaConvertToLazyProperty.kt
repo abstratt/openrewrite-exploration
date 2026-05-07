@@ -13,6 +13,16 @@ import org.openrewrite.java.tree.JavaType
 import java.util.regex.Pattern
 
 
+/**
+ * Rewrites `t.setX(v)` to `t.getX().set(v)` (or `setFrom(v)` for `ConfigurableFileCollection`).
+ *
+ * **Languages:** Java and Kotlin. The visitor extends `JavaVisitor`, which dispatches on the
+ * shared `J.*` tree produced by both the Java and Kotlin parsers — a plain explicit-setter
+ * call has the same `J.MethodInvocation` shape in either language. Groovy explicit setter
+ * calls (`t.setX(v)` with parentheses) also flow through the same node and are matched, but
+ * idiomatic Groovy `t.x v` (parameterless property syntax) is `[GroovyAddAssignment]`'s job;
+ * idiomatic Kotlin `t.x = v` is `[KotlinAddOperatorImports]`'s.
+ */
 @Suppress("unused")
 class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  val oldPattern: String, @JsonProperty("newPropertyGetter") val newPropertyGetter: String, @JsonProperty("newPropertySetter") val newPropertySetter: String, @JsonProperty("targetType") val targetType: String? = null) : Recipe() {
     override fun getDisplayName(): String = "Converts eager property ${oldPattern} to lazy property usage $newPropertyGetter"

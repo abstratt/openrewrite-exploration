@@ -10,6 +10,17 @@ import org.openrewrite.java.tree.J
 import org.openrewrite.java.tree.JavaType
 import org.openrewrite.java.tree.TypeUtils
 
+/**
+ * Inserts `.get()` after a lazy-property getter call when the consuming context still
+ * expects the eager value (variable initializer, method argument, chained eager-method, or
+ * `return` whose enclosing method's return type isn't a `Provider`).
+ *
+ * **Languages:** Java and Kotlin. Like `[JavaConvertToLazyProperty]`, this recipe extends
+ * `JavaVisitor` and therefore matches any `J.MethodInvocation` produced by the Java *or*
+ * Kotlin parsers — both call shapes (`t.getX()` in Java, the same in Kotlin source) flow
+ * through the same node. Idiomatic Kotlin property *reads* (`t.x` rather than `t.getX()`)
+ * are not matched; that's a separate rewrite.
+ */
 @Suppress("unused")
 class JavaFromLazyToEagerPropertyAssignment(
     @JsonProperty("targetType") val targetType: String,

@@ -12,6 +12,14 @@ import org.openrewrite.marker.Markers
 
 
 /**
+ * Rewrites Groovy parameterless property syntax (`val1.prop1 10`) to explicit assignment
+ * (`val1.prop1 = 10`) when `prop1` resolves to a setter on the receiver's static type.
+ * Necessary because Gradle 9 deprecated and Gradle 10 removes the space-assignment form.
+ *
+ * **Languages:** Groovy only. The visitor extends `GroovyVisitor` and inspects
+ * Groovy-specific `G.MapEntry` / `G.MapLiteral` nodes; Java and Kotlin sources are not
+ * visited.
+ *
  * @see https://docs.gradle.org/current/userguide/upgrading_version_8.html#groovy_space_assignment_syntax
  */
 @Suppress("unused")

@@ -3,6 +3,16 @@ package org.gradle.migration
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.openrewrite.Recipe
 
+/**
+ * Reads `migration-data.json` at runtime and dynamically builds a `recipeList` of pre-
+ * parameterised children of `target`. Lets the aggregate `Gradle9to10` recipe stay tiny
+ * (one block per recipe class) while still covering every catalogue entry.
+ *
+ * **Languages:** inherited from the target recipe. See the docs on
+ * `[JavaConvertToLazyProperty]` (Java + Kotlin),
+ * `[JavaFromLazyToEagerPropertyAssignment]` (Java + Kotlin), and
+ * `[KotlinAddOperatorImports]` (Kotlin only).
+ */
 @Suppress("unused")
 class MigrationCompositeRecipe(
     @JsonProperty("target") val target: String,

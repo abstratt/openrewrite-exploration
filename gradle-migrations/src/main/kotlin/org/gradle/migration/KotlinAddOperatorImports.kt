@@ -8,6 +8,15 @@ import org.openrewrite.java.tree.JavaType
 import org.openrewrite.java.tree.JavaType.Method
 import org.openrewrite.kotlin.KotlinIsoVisitor
 
+/**
+ * Adds `import org.gradle.kotlin.dsl.assign` to a Kotlin file when the file assigns to a
+ * field whose declared receiver type now exposes a `Property<T>` getter — without the
+ * import, the operator-extension that delegates `t.x = v` to `t.getX().set(v)` isn't in
+ * scope.
+ *
+ * **Languages:** Kotlin only. The visitor extends `KotlinIsoVisitor`, which is only
+ * dispatched by the Kotlin parser. Java and Groovy sources are not visited.
+ */
 @Suppress("unused")
 class KotlinAddOperatorImports constructor(@JsonProperty("targetType") val targetType: String, @JsonProperty("propertyName") val propertyName: String) : Recipe() {
     override fun getDisplayName(): String {
