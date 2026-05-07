@@ -28,7 +28,7 @@ rootProject {
         // Configure the extension
         rewrite.activeRecipe(
             "org.openrewrite.FindParseFailures",
-            "org.gradle.migration.Gradle8to9"
+            "org.gradle.migration.Gradle9to10"
         )
         rewrite.setExportDatatables(true)
     }

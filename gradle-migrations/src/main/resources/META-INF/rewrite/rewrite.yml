@@ -1,5 +1,5 @@
 type: specs.openrewrite.org/v1beta/recipe
-name: org.gradle.migration.Gradle8to9
+name: org.gradle.migration.Gradle9to10
 displayName: "My Custom Recipe"
 description: "A migration recipe for Gradle projects."
 recipeList:

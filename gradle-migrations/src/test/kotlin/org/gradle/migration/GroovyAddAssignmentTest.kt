@@ -8,7 +8,7 @@ import org.openrewrite.groovy.Assertions
 class GroovyAddAssignmentTest : RewriteTest {
     override fun defaults(spec: RecipeSpec) {
         spec.recipe(javaClass.getResourceAsStream("/META-INF/rewrite/rewrite.yml")!!,
-            "org.gradle.migration.Gradle8to9")
+            "org.gradle.migration.Gradle9to10")
     }
 
     @Test

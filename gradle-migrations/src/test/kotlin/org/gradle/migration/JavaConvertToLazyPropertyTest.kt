@@ -9,7 +9,7 @@ import org.openrewrite.test.TypeValidation
 class JavaConvertToLazyPropertyTest : RewriteTest {
     override fun defaults(spec: RecipeSpec) {
         spec.recipe(JavaConvertToLazyPropertyTest::class.java.getResourceAsStream("/META-INF/rewrite/rewrite.yml")!!,
-            "org.gradle.migration.Gradle8to9")
+            "org.gradle.migration.Gradle9to10")
         // resulting code is not necessarily valid against the current classpath, and that is fine
         spec.afterTypeValidationOptions(TypeValidation.all().methodInvocations(false))
     }
