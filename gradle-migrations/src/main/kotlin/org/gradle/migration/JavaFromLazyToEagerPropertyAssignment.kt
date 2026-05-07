@@ -64,6 +64,12 @@ class JavaFromLazyToEagerPropertyAssignment(
                             val argIndex = parent.arguments.indexOfFirst { it === current }
                             !isLazyType(paramTypeAt(parent, argIndex))
                         }
+                    is J.Return -> {
+                        val enclosing = cursor.firstEnclosing(J.MethodDeclaration::class.java)
+                        val returnType = enclosing?.methodType?.returnType
+                            ?: enclosing?.returnTypeExpression?.type
+                        !isLazyType(returnType)
+                    }
                     else -> true
                 }
             }

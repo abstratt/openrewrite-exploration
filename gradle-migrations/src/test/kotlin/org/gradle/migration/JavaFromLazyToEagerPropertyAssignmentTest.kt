@@ -201,4 +201,74 @@ class JavaFromLazyToEagerPropertyAssignmentTest : RewriteTest {
             )
         )
     }
+
+    @Test
+    fun insertsGetOnChainedEagerMethodOfCataloguedProperty() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                boolean cfg(Test t) {
+                    return t.getMaxHeapSize().endsWith("g");
+                }
+            }
+                """.trimIndent(),
+                """
+            package com.yourorg;
+
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                boolean cfg(Test t) {
+                    return t.getMaxHeapSize().get().endsWith("g");
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun doesNotTouchUncatalogedProperty() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import org.gradle.api.provider.Provider;
+
+            class Build {
+                boolean cfg(Provider<String> unrelated) {
+                    return unrelated.toString().startsWith("x");
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun doesNotAddGetCallWhenMethodReturnsProperty() {
+        rewriteRun(
+            { spec -> spec.typeValidationOptions(TypeValidation.none()) },
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import org.gradle.api.provider.Property;
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                Property<String> cfg(Test t) {
+                    return t.getMaxHeapSize();
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
 }

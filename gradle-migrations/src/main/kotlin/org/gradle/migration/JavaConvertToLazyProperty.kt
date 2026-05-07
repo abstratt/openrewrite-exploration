@@ -37,8 +37,12 @@ class JavaConvertToLazyProperty constructor(@JsonProperty("oldPattern")  val old
 
                     val argument: Expression = method.arguments[0]
 
-                    // Transform `setIncremental(b)` → `getIncremental()`
+                    // Transform `setIncremental(b)` → `getIncremental()`. The receiver
+                    // becomes a select of the new outer call, which already carries the
+                    // original prefix (leading whitespace), so clear the inner prefix to
+                    // avoid emitting it twice when the setter is at statement position.
                     val getIncrementalCall = method
+                        .withPrefix(org.openrewrite.java.tree.Space.EMPTY)
                         .withName(method.name.withSimpleName(newPropertyGetter)) // Rename method
                         .withArguments(emptyList()) // Remove arguments
 

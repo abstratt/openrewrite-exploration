@@ -1,5 +1,6 @@
 package org.gradle.migration
 
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.openrewrite.java.JavaParser
@@ -58,6 +59,44 @@ class KotlinAddOperatorImportsTest : RewriteTest {
             ) {
                 (it.parser as KotlinParser.Builder).classpath(JavaParser.runtimeClasspath())
             }
+        )
+    }
+
+    @Test
+    fun doesNotAddImportWhenAlreadyPresent() {
+        rewriteRun(
+            Assertions.kotlin(
+                """
+            package com.yourorg
+
+            import org.gradle.api.tasks.testing.Test
+            import org.gradle.kotlin.dsl.assign
+
+            class MyClass {
+                fun use(t: Test) {
+                    t.maxHeapSize = "1g"
+                }
+            }
+                """.trimIndent()
+            ) {
+                (it.parser as KotlinParser.Builder).classpath(JavaParser.runtimeClasspath())
+            }
+        )
+    }
+
+    @Test
+    fun doesNotAddImportWhenNoPropertyAssignment() {
+        rewriteRun(
+            Assertions.kotlin(
+                """
+            package com.yourorg
+
+            fun cfg() {
+                var s: String = "foo"
+                s = "bar"
+            }
+                """.trimIndent()
+            )
         )
     }
 }

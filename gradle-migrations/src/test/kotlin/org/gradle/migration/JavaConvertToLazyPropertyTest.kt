@@ -57,7 +57,7 @@ class JavaConvertToLazyPropertyTest : RewriteTest {
                         .getByName(SourceSet.MAIN_SOURCE_SET_NAME);
                     project.getPlugins().withType(JavaPlugin.class, (javaPlugin) -> project.getTasks()
                             .named(mainSourceSet.getCompileJavaTaskName(), JavaCompile.class)
-                            .configure((compileJava) ->  compileJava.getOptions().getIncremental().set(true)));
+                            .configure((compileJava) -> compileJava.getOptions().getIncremental().set(true)));
                 }
             }
                 
@@ -96,7 +96,7 @@ class JavaConvertToLazyPropertyTest : RewriteTest {
             public class ConfigurationPropertiesPlugin implements Plugin<Project> {
                 @Override
                 public void apply(Project project) {
-                    project.getTasks().withType(Test.class, (test) ->  test.getMaxHeapSize().set("1024M"));
+                    project.getTasks().withType(Test.class, (test) -> test.getMaxHeapSize().set("1024M"));
                 }
             }
                 """.trimIndent()
@@ -144,7 +144,248 @@ class JavaConvertToLazyPropertyTest : RewriteTest {
                         .getByType(JavaPluginExtension.class)
                         .getSourceSets()
                         .getByName(SourceSet.TEST_SOURCE_SET_NAME);
-                    project.getTasks().register("myTest", Test.class, (task) ->  task.getTestClassesDirs().setFrom(intTestSourceSet.getOutput().getClassesDirs()));
+                    project.getTasks().register("myTest", Test.class, (task) -> task.getTestClassesDirs().setFrom(intTestSourceSet.getOutput().getClassesDirs()));
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun migratesIntegerPropertySetter() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                void cfg(Test t) {
+                    t.setMaxParallelForks(4);
+                }
+            }
+                """.trimIndent(),
+                """
+            package com.yourorg;
+
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                void cfg(Test t) {
+                    t.getMaxParallelForks().set(4);
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun migratesBooleanPropertySetterFromExecSpec() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import org.gradle.process.ExecSpec;
+
+            class Build {
+                void cfg(ExecSpec spec) {
+                    spec.setIgnoreExitValue(true);
+                }
+            }
+                """.trimIndent(),
+                """
+            package com.yourorg;
+
+            import org.gradle.process.ExecSpec;
+
+            class Build {
+                void cfg(ExecSpec spec) {
+                    spec.getIgnoreExitValue().set(true);
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun migratesStringPropertySetter() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import org.gradle.api.tasks.compile.CompileOptions;
+
+            class Build {
+                void cfg(CompileOptions opts) {
+                    opts.setEncoding("UTF-8");
+                }
+            }
+                """.trimIndent(),
+                """
+            package com.yourorg;
+
+            import org.gradle.api.tasks.compile.CompileOptions;
+
+            class Build {
+                void cfg(CompileOptions opts) {
+                    opts.getEncoding().set("UTF-8");
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun doesNotMigrateUnrelatedSetter() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            class Build {
+                private String name;
+                public void setName(String name) { this.name = name; }
+                void cfg() { setName("abc"); }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun migratesListPropertySetter() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import java.util.List;
+            import org.gradle.api.tasks.compile.CompileOptions;
+
+            class Build {
+                void cfg(CompileOptions opts, List<String> args) {
+                    opts.setCompilerArgs(args);
+                }
+            }
+                """.trimIndent(),
+                """
+            package com.yourorg;
+
+            import java.util.List;
+            import org.gradle.api.tasks.compile.CompileOptions;
+
+            class Build {
+                void cfg(CompileOptions opts, List<String> args) {
+                    opts.getCompilerArgs().set(args);
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun migratesMapPropertySetter() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import java.util.Map;
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                void cfg(Test t, Map<String, Object> sys) {
+                    t.setSystemProperties(sys);
+                }
+            }
+                """.trimIndent(),
+                """
+            package com.yourorg;
+
+            import java.util.Map;
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                void cfg(Test t, Map<String, Object> sys) {
+                    t.getSystemProperties().set(sys);
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun rewritesMultipleSetterKindsInOnePass() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import java.util.List;
+            import org.gradle.api.file.FileCollection;
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                void cfg(Test t, FileCollection cp, List<String> jvmArgs) {
+                    t.setMaxParallelForks(4);
+                    t.setClasspath(cp);
+                    t.setJvmArgs(jvmArgs);
+                }
+            }
+                """.trimIndent(),
+                """
+            package com.yourorg;
+
+            import java.util.List;
+            import org.gradle.api.file.FileCollection;
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                void cfg(Test t, FileCollection cp, List<String> jvmArgs) {
+                    t.getMaxParallelForks().set(4);
+                    t.getClasspath().setFrom(cp);
+                    t.getJvmArgs().set(jvmArgs);
+                }
+            }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
+    fun migratesClasspathSetterAsSetFrom() {
+        rewriteRun(
+            Assertions.java(
+                """
+            package com.yourorg;
+
+            import org.gradle.api.file.FileCollection;
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                void cfg(Test t, FileCollection cp) {
+                    t.setClasspath(cp);
+                }
+            }
+                """.trimIndent(),
+                """
+            package com.yourorg;
+
+            import org.gradle.api.file.FileCollection;
+            import org.gradle.api.tasks.testing.Test;
+
+            class Build {
+                void cfg(Test t, FileCollection cp) {
+                    t.getClasspath().setFrom(cp);
                 }
             }
                 """.trimIndent()
