@@ -1,7 +1,6 @@
 package org.gradle.migration
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.gradle.internal.extensions.stdlib.capitalized
 import org.openrewrite.ExecutionContext
 import org.openrewrite.Recipe
 import org.openrewrite.java.tree.J
@@ -20,7 +19,7 @@ class KotlinAddOperatorImports constructor(@JsonProperty("targetType") val targe
     }
 
     override fun getVisitor(): KotlinIsoVisitor<ExecutionContext> {
-        val candidateSetter = "set${propertyName.capitalized()}"
+        val candidateSetter = "set${propertyName.replaceFirstChar(Char::uppercaseChar)}"
         return object : KotlinIsoVisitor<ExecutionContext>() {
             override fun visitAssignment(assignment: J.Assignment, p: ExecutionContext): J.Assignment {
                 var containsAssignment = false

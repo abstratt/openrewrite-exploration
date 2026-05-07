@@ -1,7 +1,5 @@
 package org.gradle.migration
 
-import org.gradle.internal.extensions.stdlib.capitalized
-import org.gradle.internal.impldep.org.yaml.snakeyaml.error.Mark
 import org.openrewrite.ExecutionContext
 import org.openrewrite.Recipe
 import org.openrewrite.Tree.randomId
@@ -34,7 +32,7 @@ class GroovyAddAssignment : Recipe() {
                     val selectType = method.select?.type
                     if (selectType is JavaType.Class) {
                         val setter = selectType.visibleMethods.asSequence()
-                            .find { it.name == "set${method.name.simpleName.capitalized()}" }
+                            .find { it.name == "set${method.name.simpleName.replaceFirstChar(Char::uppercaseChar)}" }
                         if (setter !== null) {
                             if (method.arguments.size == 1) {
                                 val name = method.name.simpleName
@@ -93,7 +91,7 @@ class GroovyAddAssignment : Recipe() {
                     method.prefix,
                     method.markers,
                     fieldAccess,
-                    JLeftPadded(Space.EMPTY, assignedExpression, Markers.EMPTY),
+                    JLeftPadded(Space.SINGLE_SPACE, assignedExpression, Markers.EMPTY),
                     null
                 )
                 return autoFormat(assignment, ctx)
