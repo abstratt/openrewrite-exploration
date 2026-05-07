@@ -16,7 +16,10 @@ git clone https://github.com/spring-projects/spring-boot.git
 
 ```
 cd spring-boot
-gradle :buildSrc:rewriteRun  -I <LOCAL-PATH-TO-THIS-REPO>/gradle-migrations/apply-migrations.gradle.kts --no-build-cache --no-daemon -Dorg.gradle.jvmargs="-Xmx16g" -x :buildSrc:test
+````
+
+```
+gradle :buildSrc:rewriteRun  -I ../gradle-migrations/apply-migrations.gradle.kts --no-build-cache --no-daemon -Dorg.gradle.jvmargs="-Xmx16g" -x :buildSrc:test
 ```
 
 We apply an init script, and exclude tasks that we don't want to run in the current repo.
